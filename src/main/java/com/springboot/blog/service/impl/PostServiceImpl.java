@@ -1,7 +1,7 @@
 package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.Post;
-import com.springboot.blog.exception.ResourceNotException;
+import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
@@ -52,13 +52,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPostById(long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotException("Post", "id", id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
         return mapToDto(post);
     }
 
     @Override
     public PostDto updatePost(PostDto postDto, long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotException("Post", "id", id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setDescription(postDto.getDescription());
@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotException("Post", "id", id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
         postRepository.deleteById(id);
     }
 
