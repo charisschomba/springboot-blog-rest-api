@@ -28,5 +28,5 @@ public class Post {
     private Set<Comment> comments = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category categories;
+    private Category category;
 }
