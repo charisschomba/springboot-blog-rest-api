@@ -4,6 +4,8 @@ import com.springboot.blog.payload.CategoriesResponse;
 import com.springboot.blog.payload.CategoryDto;
 import com.springboot.blog.service.CategoryService;
 import com.springboot.blog.utils.AppConstants;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/categories")
+@Tag(
+        name = "CRUD APIs for Category Resource"
+)
 public class CategoryController {
 
     private CategoryService categoryService;
@@ -19,6 +24,9 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @SecurityRequirement(
+            name = "Bearer Authentication"
+    )
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryDto categoryDto) {
@@ -43,6 +51,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoriesResponse);
     }
 
+    @SecurityRequirement(
+            name = "Bearer Authentication"
+    )
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryDto categoryDto) {
@@ -51,6 +62,9 @@ public class CategoryController {
         return ResponseEntity.ok(updateCategoryDto);
     }
 
+    @SecurityRequirement(
+            name = "Bearer Authentication"
+    )
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCategory(@PathVariable("id") Long categoryId) {
