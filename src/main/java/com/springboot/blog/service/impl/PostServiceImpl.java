@@ -2,11 +2,13 @@ package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.Category;
 import com.springboot.blog.entity.Post;
+import com.springboot.blog.entity.Tag;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.payload.PostDto;
 import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.CategoryRepository;
 import com.springboot.blog.repository.PostRepository;
+import com.springboot.blog.repository.TagRepository;
 import com.springboot.blog.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -20,15 +22,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
-    private PostRepository postRepository;
-    private ModelMapper mapper;
-    private CategoryRepository categoryRepository;
-
-    public PostServiceImpl(PostRepository postRepository, ModelMapper mapper, CategoryRepository categoryRepository) {
+    private final PostRepository postRepository;
+    private final ModelMapper mapper;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
+    public PostServiceImpl(PostRepository postRepository, ModelMapper mapper, CategoryRepository categoryRepository, TagRepository tagRepository) {
 
         this.postRepository = postRepository;
         this.mapper = mapper;
         this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
     }
     @Override
     public PostDto createPost(PostDto postDto) {
@@ -37,12 +40,15 @@ public class PostServiceImpl implements PostService {
         Post post = mapToEntity(postDto);
         Long categoryId = postDto.getCategoryId();
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "Id", categoryId));
+        if(postDto.getTagId() != null) {
+           Tag tag = tagRepository.findById(postDto.getTagId()).orElseThrow(() -> new ResourceNotFoundException("Tag", "Id", postDto.getTagId()));
+           post.setTag(tag);
+        }
         post.setCategory(category);
         Post newPost = postRepository.save(post);
 
         //  Convert entity to DTO
-        PostDto postDtoResponse = mapToDto(newPost);
-        return postDtoResponse;
+        return mapToDto(newPost);
     }
 
     @Override
@@ -56,9 +62,8 @@ public class PostServiceImpl implements PostService {
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Post> posts = postRepository.findAll(pageable);
-        PostResponse postResponse = postResponse(posts);
 
-        return postResponse;
+        return postResponse(posts);
     }
 
     @Override
@@ -76,6 +81,10 @@ public class PostServiceImpl implements PostService {
         Long categoryId = postDto.getCategoryId();
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category", "Id", categoryId));
         post.setCategory(category);
+        if(postDto.getTagId() != null) {
+            Tag tag = tagRepository.findById(postDto.getTagId()).orElseThrow(() -> new ResourceNotFoundException("Tag", "Id", postDto.getTagId()));
+            post.setTag(tag);
+        }
         Post updatedPost = postRepository.save(post);
 
         return mapToDto(updatedPost);
@@ -99,6 +108,21 @@ public class PostServiceImpl implements PostService {
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Post> posts = postRepository.findByCategoryId(categoryId, pageable);
+        PostResponse postResponse = postResponse(posts);
+
+        return postResponse;
+    }
+
+    @Override
+    public PostResponse getPostsTagByTagId(Long tagId, int pageNo, int pageSize, String sortBy, String sortDir) {
+        // create Sort instance
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending():
+                Sort.by(sortBy).descending();
+
+        // create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Post> posts = postRepository.findByCategoryId(tagId, pageable);
         PostResponse postResponse = postResponse(posts);
 
         return postResponse;

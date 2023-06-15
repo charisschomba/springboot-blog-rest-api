@@ -31,6 +31,9 @@ public class PostDto {
     private Set<CommentDto> comments;
 
     @NotNull
-    @Schema(description = "Blog post category")
+    @Schema(description = "Category for a post")
     private Long categoryId;
+
+    @Schema(description = "Tag for a post ")
+    private Long tagId;
 }
