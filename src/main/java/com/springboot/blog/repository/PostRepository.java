@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    Page findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Post> findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Post> findByTagId(Long tagId, Pageable pageable);
 }
