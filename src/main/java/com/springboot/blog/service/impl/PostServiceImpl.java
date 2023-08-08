@@ -122,10 +122,9 @@ public class PostServiceImpl implements PostService {
 
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Post> posts = postRepository.findByCategoryId(tagId, pageable);
-        PostResponse postResponse = postResponse(posts);
+        Page<Post> posts = postRepository.findByTagId(tagId, pageable);
 
-        return postResponse;
+        return postResponse(posts);
     }
 
     //  Convert entity to DTO
@@ -141,12 +140,11 @@ public class PostServiceImpl implements PostService {
 
     // Convert DTO to Entity
     private Post mapToEntity(PostDto postDto) {
-        Post post = mapper.map(postDto, Post.class);
-//        Post post = new Post();
+        //        Post post = new Post();
 //        post.setTitle(postDto.getTitle());
 //        post.setDescription(postDto.getDescription());
 //        post.setContent(postDto.getContent());
-        return post;
+        return mapper.map(postDto, Post.class);
     }
     private PostResponse postResponse(Page<Post> posts) {
         //get content for page object
